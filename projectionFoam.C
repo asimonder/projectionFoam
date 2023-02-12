@@ -44,18 +44,32 @@ Description
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "turbulentTransportModel.H"
+#include "pisoControl.H"
+#include "fvOptions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
 
+    argList::addNote
+    (
+        "Transient solver for incompressible, turbulent flow,"
+        " using the PROJECTION algorithm."
+    );
+
+    #include "postProcess.H"
+
+    #include "addCheckCaseOptions.H"
+    #include "setRootCaseLists.H"
     #include "createTime.H"
     #include "createMesh.H"
+    #include "createControl.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,74 +79,74 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 	
-        #include "readPISOControls.H"
+	// #include "readPISOControls.H"
         #include "CourantNo.H"
 
         // Non-iterative projection scheme
         {
-	    //linearization of convective flux using second order extrapolation  	  
-	    surfaceScalarField phi_o(0.5*(3.0*phi.oldTime()-phi.oldTime().oldTime()));
 	  
-	    // Momentum step
+	  MRF.correctBoundaryVelocity(U);
+	  //linearization of convective flux using second order extrapolation  	  
+	  surfaceScalarField phi_o(0.5*(3.0*phi.oldTime()-phi.oldTime().oldTime()));
+	  
+	  // Momentum step
 
-            fvVectorMatrix UEqn
+	  fvVectorMatrix UEqn
             (
-                fvm::ddt(U)
-              + fvm::div(phi_o, U)
-              + turbulence->divDevReff(U)
-            );
+	     fvm::ddt(U)+fvm::div(phi_o, U)
+	     + MRF.DDt(U)
+	     + turbulence->divDevReff(U)
+	     );
+	  solve(UEqn == -fvc::grad(p));
+	  fvOptions.correct(U);
 
-	    solve(UEqn == -fvc::grad(p));
- 
-            // Projection step
+	  // Projection step
 
-	    dimensionedScalar dt=runTime.deltaT();
-	    scalar rDeltaT=1.0/dt.value();
+	  dimensionedScalar dt=runTime.deltaT();
+	  scalar rDeltaT=1.0/dt.value();
 
-	    U += dt*fvc::grad(p);
-	    U.correctBoundaryConditions();
+	  U += dt*fvc::grad(p);
+	  U.correctBoundaryConditions();
       
-	    phi= (fvc::interpolate(U) & mesh.Sf());
+	  phi= (fvc::interpolate(U) & mesh.Sf());
       
-	    adjustPhi(phi, U, p);
-	  
-	    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
-	      { 
-		fvScalarMatrix pEqn
-		  (
-		   fvm::laplacian(dt, p) == fvc::div(phi)
-		   );
-	  
-		pEqn.setReference(pRefCell, pRefValue);
-	  
-		if(nonOrth == nNonOrthCorr)
-		  {
-		    pEqn.solve(mesh.solver("pFinal"));
-		  }
-		else
-		  {
-		    pEqn.solve();
-		  }
-	  
-		if (nonOrth == nNonOrthCorr)
-		  {
-		    phi -= pEqn.flux();
-		  }  
-	      }
+	  MRF.makeRelative(phi);
 
+	  adjustPhi(phi, U, p);
+
+
+	  while (piso.correctNonOrthogonal())
+	    {
+	      // Pressure projection
+
+	      fvScalarMatrix pEqn
+		(
+		 fvm::laplacian(dt, p) == fvc::div(phi)
+		 );
+	      
+	      pEqn.setReference(pRefCell, pRefValue);
+    
+	      pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
+	      
+	      if (piso.finalNonOrthogonalIter())
+		{
+		  phi -= pEqn.flux();
+		}
+	    }
+	  
             #include "continuityErrs.H"
 
 	    U -= dt*fvc::grad(p);
 	    U.correctBoundaryConditions();
+	    fvOptions.correct(U);
 	}       
 	
-	turbulence->correct();
+        laminarTransport.correct();
+        turbulence->correct();
 
-	runTime.write();
-	    
-	Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	    << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-	    << nl << endl;
+        runTime.write();
+
+        runTime.printExecutionTime(Info);
     }
 
     Info<< "End\n" << endl;

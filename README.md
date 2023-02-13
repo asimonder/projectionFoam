@@ -1,3 +1,7 @@
+# 2023 (in progress)
+Being adapted to v2006. Some benchmarks are in the works.
+
+# 2013
 The pisoFoam solver to solve incompressible transient flows is iterative. Here it is replaced with an incremental projection scheme which is non-iterative therefore costs less than pisoFoam. In this classical scheme we first solve the momentum equation using the old time step pressure. Then, unsoleinoidal part of the velocity is projected out by solving the Poisson equation. The scheme is mass-conservative and has an additional second order segregation error in time for velocity. Therefore, the accuracy order is consistent with second order time integrators in OpenFOAM such as Crank-Nicolson and backwards schemes.
 
 Additional improvement was made on the linearization of the convective flux (phi). A second order extrapolation is implemented in time to replace the first order lagged phi. Hence, the overall accuracy of time stepping is increased to second order.

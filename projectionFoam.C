@@ -46,6 +46,7 @@ Description
 #include "singlePhaseTransportModel.H"
 #include "turbulentTransportModel.H"
 #include "pisoControl.H"
+//#include "pimpleControl.H"
 #include "fvOptions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -87,13 +88,14 @@ int main(int argc, char *argv[])
 	  
 	  MRF.correctBoundaryVelocity(U);
 	  //linearization of convective flux using second order extrapolation  	  
-	  surfaceScalarField phi_o(0.5*(3.0*phi.oldTime()-phi.oldTime().oldTime()));
-	  
+	  //surfaceScalarField phi_o(0.5*(3.0*phi.oldTime()-phi.oldTime().oldTime()));
+	  phi=(0.5*(3.0*phi.oldTime()-phi.oldTime().oldTime()));
 	  // Momentum step
 
 	  fvVectorMatrix UEqn
             (
-	     fvm::ddt(U)+fvm::div(phi_o, U)
+	     //fvm::ddt(U)+fvm::div(phi_o, U)
+	     fvm::ddt(U)+fvm::div(phi, U)
 	     + MRF.DDt(U)
 	     + turbulence->divDevReff(U)
 	     );
@@ -103,7 +105,7 @@ int main(int argc, char *argv[])
 	  // Projection step
 
 	  dimensionedScalar dt=runTime.deltaT();
-	  scalar rDeltaT=1.0/dt.value();
+	  //scalar rDeltaT=1.0/dt.value();
 
 	  U += dt*fvc::grad(p);
 	  U.correctBoundaryConditions();
@@ -126,7 +128,8 @@ int main(int argc, char *argv[])
 	      
 	      pEqn.setReference(pRefCell, pRefValue);
     
-	      pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
+	      //pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
+	      pEqn.solve(mesh.solver(p.select(1)));
 	      
 	      if (piso.finalNonOrthogonalIter())
 		{

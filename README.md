@@ -1,4 +1,4 @@
-# 2023 (in progress)
+# 2023 
 Updated the solver for OpenFOAM v2006. 
 
 Benchmarks are in the works.

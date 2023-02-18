@@ -98,6 +98,8 @@ int main(int argc, char *argv[])
 	     fvm::ddt(U)+fvm::div(phi, U)
 	     + MRF.DDt(U)
 	     + turbulence->divDevReff(U)
+	      ==
+	     fvOptions(U)
 	     );
 	  solve(UEqn == -fvc::grad(p));
 	  fvOptions.correct(U);
@@ -128,8 +130,7 @@ int main(int argc, char *argv[])
 	      
 	      pEqn.setReference(pRefCell, pRefValue);
     
-	      //pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
-	      pEqn.solve(mesh.solver(p.select(1)));
+	      pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
 	      
 	      if (piso.finalNonOrthogonalIter())
 		{

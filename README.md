@@ -1,5 +1,5 @@
 # projectionFoam 
-Transient solver for incompressible, turbulent flow using the projection algorithm for velocity-pressure decoupling.
+Transient solver for incompressible, turbulent flows using the projection algorithm for velocity-pressure decoupling.
 
 ## 2023 
 Updated the solver for OpenFOAM v2006. 
@@ -15,8 +15,14 @@ The Rhie-Chow interpolation is applied in a very similar way with pisoFoam. The 
 
 It is tested for turbulent and laminar flows. We observed that the projection solver is more stable than pisoFoam and therefore higher Courant numbers are feasible.
 
-### References:
-Onder, A., Meyers, J. (2013). HPC realization of a controlled turbulent jet using OpenFOAM. Open Source CFD International Conference 2013. Hamburg, 24-25 October 2013. (will be available online soon)
+## Publications:
+[1] Önder, A., & Meyers, J. (2014). HPC realization of a controlled turbulent round jet using OpenFOAM. arXiv preprint arXiv:1406.7231.
+
+[2] Önder, A., & Meyers, J. (2014). Modification of vortex dynamics and transport properties of transitional axisymmetric jets using zero-net-mass-flux actuation. *Physics of Fluids*, 26(7), 075103.
+
+[3] Önder, A. (2014) Active control of turbulent axisymmetric jets using zero-net-mass-flux actuation. *PhD Thesis*. 
+
+[4] Önder, A., & Meyers, J. (2016). Optimal control of a transitional jet using a continuous adjoint method. *Computers & Fluids*, 126, 12-24.
 
 
 ## Author

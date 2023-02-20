@@ -118,7 +118,6 @@ int main(int argc, char *argv[])
 
 	  adjustPhi(phi, U, p);
 
-
 	  while (piso.correctNonOrthogonal())
 	    {
 	      // Pressure projection

@@ -20,7 +20,7 @@ It is tested for turbulent and laminar flows. We observed that the projection so
 
 [2] Önder, A., & Meyers, J. (2014). Modification of vortex dynamics and transport properties of transitional axisymmetric jets using zero-net-mass-flux actuation. *Physics of Fluids*, 26(7), 075103.
 
-[3] Önder, A. (2014) Active control of turbulent axisymmetric jets using zero-net-mass-flux actuation. *PhD Thesis*. 
+[3] Önder, A. (2014) Active control of turbulent axisymmetric jets using zero-net-mass-flux actuation. *PhD Thesis*. KU Leuven.
 
 [4] Önder, A., & Meyers, J. (2016). Optimal control of a transitional jet using a continuous adjoint method. *Computers & Fluids*, 126, 12-24.
 

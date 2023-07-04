@@ -1,7 +1,7 @@
 MRF.correctBoundaryVelocity(U);
 
 //linearization of convective flux using second order extrapolation  	  
-phi=(0.5*(3.0*phi.oldTime()-phi.oldTime().oldTime()));
+phi=0.5*(3.0*phi-phi.oldTime());
 
 fvVectorMatrix UEqn
 (

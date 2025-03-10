@@ -1,5 +1,5 @@
 # projectionFoam 
-Transient solver developed for OpenFOAM library to simulate incompressible, turbulent flows. The solver uses the projection algorithm for velocity-pressure decoupling.
+A non-iterative OpenFOAM solver to simulate laminar and turbulent single-phase flows. The solver uses the projection algorithm for velocity-pressure decoupling.
 
 ## 2023 
 Updated the solver for OpenFOAM v2006 and above. 
